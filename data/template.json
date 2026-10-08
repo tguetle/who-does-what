@@ -1,0 +1,19 @@
+{
+  "organization": {
+    "name": "Neue Organisation",
+    "version": "1.0.0",
+    "boardTitle": "Vorstand",
+    "boardDescription": "Leitung der Organisation",
+    "terms": {
+      "boardRole": "Vorstandsamt",
+      "portfolio": "Ressort"
+    }
+  },
+  "root": {
+    "title": "Mitgliederversammlung",
+    "description": "Oberstes Beschlussorgan"
+  },
+  "people": [],
+  "board": [],
+  "sections": []
+}

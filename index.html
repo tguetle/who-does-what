@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <meta
+    name="description"
+    content="Organisations- und Kompetenzstruktur"
+  >
+
+  <title>Who Does What</title>
+
+  <link rel="stylesheet" href="./css/styles.css">
+  <script src="./js/i18n.js" defer></script>
+  <script src="./js/app.js" defer></script>
+  <script src="./js/views.js" defer></script>
+  <script src="./js/editor.js" defer></script>
+</head>
+
+<body>
+  <header class="page-header">
+    <div>
+      <img id="org-logo" class="org-logo" alt="" hidden>
+      <p class="eyebrow">
+        <span id="org-name"></span>
+        <span class="mode-badge" data-internal>Interne Ansicht</span>
+      </p>
+      <h1>Who Does What</h1>
+      <p id="data-status" class="subtitle">
+        Daten werden geladen …
+      </p>
+      <p id="print-status" class="subtitle print-only"></p>
+    </div>
+
+    <div class="toolbar" aria-label="Werkzeuge">
+      <label class="search">
+        <span class="sr-only">Organigramm durchsuchen</span>
+        <input
+          id="search-input"
+          type="search"
+          placeholder="Rolle, Person oder Aufgabe suchen"
+        >
+      </label>
+
+      <div class="toolbar-group" role="group" aria-label="Anlegen" data-internal>
+        <button id="add-section-button" class="button" type="button">
+          + Bereich
+        </button>
+        <button id="add-role-button" class="button button-primary" type="button">
+          + Rolle
+        </button>
+        <button id="add-person-button" class="button" type="button">
+          + Person
+        </button>
+      </div>
+
+      <div class="toolbar-group" role="group" aria-label="Organisation" data-internal>
+        <button id="organization-button" class="button" type="button">
+          Organisation bearbeiten
+        </button>
+        <button id="new-organization-button" class="button" type="button">
+          Neue Organisation
+        </button>
+      </div>
+
+      <div class="toolbar-group" role="group" aria-label="Ansicht und Ausgabe">
+        <button id="print-button" class="button" type="button">
+          Drucken / PDF
+        </button>
+        <button id="public-preview-button" class="button" type="button" data-internal>
+          Öffentliche Vorschau
+        </button>
+        <button id="internal-view-button" class="button button-primary" type="button" hidden>
+          Zur internen Ansicht
+        </button>
+      </div>
+
+      <div class="toolbar-group" role="group" aria-label="Daten" data-internal>
+        <button id="export-button" class="button" type="button">
+          JSON herunterladen
+        </button>
+        <label class="button file-button">
+          JSON importieren
+          <input
+            id="import-input"
+            type="file"
+            accept=".json,application/json"
+          >
+        </label>
+      </div>
+
+      <div class="toolbar-group" role="group" aria-label="Zurücksetzen" data-internal>
+        <button id="reset-button" class="button button-danger" type="button">
+          Lokale Änderungen verwerfen
+        </button>
+      </div>
+
+      <select id="language-select" class="language-select" aria-label="Sprache"></select>
+    </div>
+  </header>
+
+  <nav class="view-bar" aria-label="Ansicht und Filter">
+    <div class="segmented" role="group" aria-label="Ansicht">
+      <button type="button" data-view="organigramm" aria-pressed="true">
+        Organigramm
+      </button>
+      <button type="button" data-view="baum" aria-pressed="false">
+        Baum
+      </button>
+      <button type="button" data-view="persons" aria-pressed="false">
+        Personen
+      </button>
+      <button type="button" data-view="contacts" aria-pressed="false">
+        Wen frage ich?
+      </button>
+      <button type="button" data-view="join" aria-pressed="false">
+        Mitmachen
+      </button>
+      <button type="button" data-view="competencies" aria-pressed="false" data-internal>
+        Kompetenzen
+      </button>
+      <button type="button" data-view="risks" aria-pressed="false" data-internal>
+        Risiken
+      </button>
+    </div>
+
+    <div class="filter-chips" role="group" aria-label="Statusfilter" data-internal>
+      <button class="chip" type="button" data-filter="all" aria-pressed="true">
+        Alle <span class="chip-count"></span>
+      </button>
+      <button class="chip chip-warning" type="button" data-filter="action" aria-pressed="false">
+        Handlungsbedarf <span class="chip-count"></span>
+      </button>
+      <button class="chip chip-warning" type="button" data-filter="vacant" aria-pressed="false">
+        Vakant <span class="chip-count"></span>
+      </button>
+      <button class="chip chip-warning" type="button" data-filter="unclear" aria-pressed="false">
+        Kompetenz unklar <span class="chip-count"></span>
+      </button>
+      <button class="chip chip-warning" type="button" data-filter="proposed" aria-pressed="false">
+        Vorschlag <span class="chip-count"></span>
+      </button>
+    </div>
+  </nav>
+
+  <div id="repository-warning" class="message message-warning" hidden>
+    <strong>Im Repository gibt es einen neueren Datenstand.</strong>
+    Du siehst deine lokal bearbeitete Version. Änderungen, die inzwischen im
+    Repository gemacht wurden, sind darin nicht enthalten.
+
+    <div class="message-actions">
+      <button id="load-repository-button" class="button" type="button">
+        Repository-Version laden
+      </button>
+      <button id="dismiss-warning-button" class="button" type="button">
+        Lokale Version behalten
+      </button>
+    </div>
+  </div>
+
+  <div id="message" class="message" hidden></div>
+
+  <main>
+    <aside class="legend" aria-label="Legende">
+      <p>
+        Durchgezogene Zuordnung: organisatorischer Verantwortungsbereich.
+        Förderverein und externe Stellen werden als eigenständige Partner
+        dargestellt.
+      </p>
+    </aside>
+
+    <section
+      id="organigramm"
+      class="organigramm"
+      aria-live="polite"
+    >
+      <div class="loading">
+        <div class="spinner" aria-hidden="true"></div>
+        <p>Organigramm wird aus der JSON-Datei geladen …</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="page-footer">
+    <p>
+      Who Does What · App-Version <span id="app-version"></span>
+      <span id="app-build" class="app-build" hidden></span>
+    </p>
+  </footer>
+
+  <!-- Dialog: Rolle bearbeiten -->
+  <dialog id="role-dialog" aria-labelledby="role-dialog-title">
+    <form id="role-form" method="dialog">
+      <div class="dialog-header">
+        <h2 id="role-dialog-title">Rolle bearbeiten</h2>
+
+        <button class="icon-button" type="button" aria-label="Dialog schließen" data-close-dialog>
+          ×
+        </button>
+      </div>
+
+      <input id="role-id" type="hidden">
+
+      <div class="form-grid">
+        <h3 class="form-section">Einordnung</h3>
+
+        <label>
+          Bereich
+          <select id="role-section" required></select>
+        </label>
+
+        <label>
+          Status
+          <select id="role-status">
+            <option value="">Kein besonderer Status</option>
+            <option value="official">Offiziell benannt</option>
+            <option value="vacant">Vakant</option>
+            <option value="unclear">Kompetenz unklar</option>
+            <option value="proposed">Vorschlag / zu prüfen</option>
+            <option value="external">Extern</option>
+            <option value="partner">Eigenständiger Partner</option>
+          </select>
+        </label>
+
+        <label class="form-full">
+          Untergeordnet unter (vorgesetzte Rolle)
+          <select id="role-reports-to"></select>
+        </label>
+
+        <label class="form-full">
+          Funktion / Rolle
+          <input id="role-title" type="text" required>
+        </label>
+
+        <h3 class="form-section">Personen</h3>
+
+        <div class="form-full form-field">
+          <span class="form-label">Personen</span>
+          <div id="role-people-picker" class="person-picker"></div>
+        </div>
+
+        <label class="form-full">
+          Hinweis, wenn keine Person benannt ist
+          <input
+            id="role-person-note"
+            type="text"
+            data-term-placeholder="z. B. Vakant – derzeit wahrgenommen von „{board}“"
+          >
+        </label>
+
+        <div class="form-full form-field">
+          <span class="form-label">Stellvertretung</span>
+          <div id="role-deputy-picker" class="person-picker"></div>
+        </div>
+
+        <h3 class="form-section">Bestellung und Kontakt</h3>
+
+        <label>
+          Bestellung
+          <select id="role-appointment"></select>
+        </label>
+
+        <label>
+          Amtszeit bis (Jahr)
+          <input id="role-term-until" type="number" min="2000" max="2100" step="1" placeholder="z. B. 2027">
+        </label>
+
+        <label>
+          E-Mail der Funktion
+          <input id="role-email" type="email" placeholder="leer = E-Mail des Bereichs">
+        </label>
+
+        <label>
+          Freigabegrenze in €
+          <input id="role-spending-limit" type="number" min="0" step="1" data-term-placeholder="Ausgaben ohne {board} bis …">
+        </label>
+
+        <h3 class="form-section">Aufgaben und Kompetenzen</h3>
+
+        <label class="form-full">
+          Aufgaben
+          <textarea id="role-tasks" rows="3"></textarea>
+        </label>
+
+        <label class="form-full">
+          Darf selbst entscheiden
+          <textarea id="role-autonomy" rows="3"></textarea>
+        </label>
+
+        <label class="form-full">
+          <span data-term-text="{board} muss zustimmen bei">Vorstand muss zustimmen bei</span>
+          <textarea id="role-approval" rows="3"></textarea>
+        </label>
+
+        <div class="form-full form-field">
+          <span class="form-label">Entscheidungsbefugnisse (Freigabe-Matrix)</span>
+          <div id="role-decisions" class="decision-grid"></div>
+        </div>
+
+        <h3 class="form-section">Mitmachen und „Wen frage ich?“</h3>
+
+        <label>
+          Zeitaufwand
+          <input id="role-effort" type="text" placeholder="z. B. ca. 2 Stunden pro Woche">
+        </label>
+
+        <label class="checkbox-label">
+          <input id="role-seeking" type="checkbox">
+          Wir suchen Unterstützung
+        </label>
+
+        <label class="form-full">
+          Themen für „Wen frage ich?“ (eins pro Zeile)
+          <textarea id="role-topics" rows="3" placeholder="z. B. Probetraining für mein Kind"></textarea>
+        </label>
+
+        <h3 class="form-section">Sonstiges</h3>
+
+        <label class="form-full">
+          Organisatorische Bemerkung
+          <textarea id="role-note" rows="2"></textarea>
+        </label>
+
+        <label class="form-full">
+          Quelle / Unterseite
+          <input
+            id="role-source"
+            type="text"
+            placeholder="z. B. /vorstandschaft-und-beiraete"
+          >
+        </label>
+      </div>
+
+      <div class="dialog-actions">
+        <button class="button" type="button" data-close-dialog>
+          Abbrechen
+        </button>
+
+        <button class="button button-primary" type="submit">
+          Speichern
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Dialog: Bereich anlegen/bearbeiten -->
+  <dialog id="section-dialog" aria-labelledby="section-dialog-title">
+    <form id="section-form" method="dialog">
+      <div class="dialog-header">
+        <h2 id="section-dialog-title">Bereich anlegen</h2>
+
+        <button class="icon-button" type="button" aria-label="Dialog schließen" data-close-dialog>
+          ×
+        </button>
+      </div>
+
+      <input id="section-id" type="hidden">
+
+      <div class="form-grid">
+        <label class="form-full">
+          Name des Bereichs
+          <input
+            id="section-title"
+            type="text"
+            placeholder="z. B. Kommunikation und Medien"
+            required
+          >
+        </label>
+
+        <label>
+          Symbol
+          <input
+            id="section-icon"
+            type="text"
+            placeholder="z. B. 📣"
+          >
+        </label>
+
+        <label>
+          Darstellungsart
+          <select id="section-type">
+            <option value="internal">Interner Verantwortungsbereich</option>
+            <option value="assembly" data-term-text="Direkt der {topOrgan} zugeordnet">Direkt der Mitgliederversammlung zugeordnet</option>
+            <option value="partner">Eigenständiger Partner</option>
+          </select>
+        </label>
+
+        <label>
+          E-Mail-Adresse des Bereichs
+          <input id="section-email" type="email">
+        </label>
+
+        <label>
+          <span data-term-text="{portfolio}">Ressort</span>
+          <select id="section-board-member"></select>
+        </label>
+
+        <label class="form-full">
+          Beschreibung
+          <textarea id="section-description" rows="3"></textarea>
+        </label>
+      </div>
+
+      <div class="dialog-actions">
+        <button id="section-delete-button" class="button button-danger dialog-delete" type="button" hidden>
+          Bereich löschen
+        </button>
+
+        <button class="button" type="button" data-close-dialog>
+          Abbrechen
+        </button>
+
+        <button id="section-submit-button" class="button button-primary" type="submit">
+          Bereich anlegen
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Dialog: Vorstandsamt -->
+  <dialog id="board-dialog" aria-labelledby="board-dialog-title">
+    <form id="board-form" method="dialog">
+      <div class="dialog-header">
+        <h2 id="board-dialog-title">Vorstandsamt bearbeiten</h2>
+
+        <button class="icon-button" type="button" aria-label="Dialog schließen" data-close-dialog>
+          ×
+        </button>
+      </div>
+
+      <input id="board-id" type="hidden">
+
+      <div class="form-grid">
+        <label class="form-full">
+          Amt
+          <input id="board-title" type="text" placeholder="z. B. 2. Vorsitzender" required>
+        </label>
+
+        <div class="form-full form-field">
+          <span class="form-label">Personen</span>
+          <div id="board-people-picker" class="person-picker"></div>
+        </div>
+
+        <label>
+          Bestellung
+          <select id="board-appointment"></select>
+        </label>
+
+        <label>
+          Amtszeit bis (Jahr)
+          <input id="board-term-until" type="number" min="2000" max="2100" step="1" placeholder="z. B. 2027">
+        </label>
+
+        <label>
+          E-Mail des Amts
+          <input id="board-email" type="email">
+        </label>
+
+        <label>
+          Quelle / Unterseite
+          <input id="board-source" type="text">
+        </label>
+      </div>
+
+      <div class="dialog-actions">
+        <button id="board-delete-button" class="button button-danger dialog-delete" type="button" hidden>
+          Amt löschen
+        </button>
+
+        <button class="button" type="button" data-close-dialog>
+          Abbrechen
+        </button>
+
+        <button class="button button-primary" type="submit">
+          Speichern
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Dialog: Person -->
+  <dialog id="person-dialog" aria-labelledby="person-dialog-title">
+    <form id="person-form" method="dialog">
+      <div class="dialog-header">
+        <h2 id="person-dialog-title">Person bearbeiten</h2>
+
+        <button class="icon-button" type="button" aria-label="Dialog schließen" data-close-dialog>
+          ×
+        </button>
+      </div>
+
+      <input id="person-id" type="hidden">
+
+      <p class="form-warning">
+        Alles, was hier eingetragen wird, landet in der JSON-Datei. Ist die
+        Seite oder das Repository öffentlich, kann jeder diese Daten abrufen –
+        auch wenn die öffentliche Ansicht sie ausblendet. Bitte nur Daten mit
+        Einwilligung der Person eintragen.
+      </p>
+
+      <div class="form-grid">
+        <label class="form-full">
+          Name
+          <input id="person-name" type="text" required>
+        </label>
+
+        <label>
+          E-Mail
+          <input id="person-email" type="email">
+        </label>
+
+        <label>
+          Telefon
+          <input id="person-phone" type="tel">
+        </label>
+
+        <div class="form-full form-field">
+          <span class="form-label">Foto</span>
+
+          <div class="photo-field">
+            <div id="person-photo-preview"></div>
+
+            <div class="photo-inputs">
+              <input
+                id="person-photo"
+                type="text"
+                placeholder="Bild-URL oder Pfad, z. B. images/personen/name.jpg"
+                aria-label="Bild-URL oder Pfad"
+              >
+
+              <div class="photo-buttons">
+                <label class="button file-button">
+                  Bild hochladen
+                  <input id="person-photo-file" type="file" accept="image/*">
+                </label>
+
+                <button id="person-photo-remove" class="button" type="button">
+                  Bild entfernen
+                </button>
+              </div>
+
+              <p class="form-hint">
+                Hochgeladene Bilder werden auf max. 256 px verkleinert und
+                direkt in der JSON-Datei gespeichert.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <label class="form-full checkbox-label">
+          <input id="person-consent" type="checkbox">
+          Einwilligung liegt vor: Kontaktdaten und Foto dürfen öffentlich angezeigt werden
+        </label>
+
+        <label class="form-full">
+          Interne Notiz
+          <textarea id="person-note" rows="2"></textarea>
+        </label>
+
+        <div class="form-full form-field">
+          <span class="form-label">Funktionen</span>
+          <div id="person-functions"></div>
+        </div>
+      </div>
+
+      <div class="dialog-actions">
+        <button id="person-delete-button" class="button button-danger dialog-delete" type="button" hidden>
+          Person löschen
+        </button>
+
+        <button class="button" type="button" data-close-dialog>
+          Abbrechen
+        </button>
+
+        <button class="button button-primary" type="submit">
+          Speichern
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Dialog: Organisation -->
+  <dialog id="organization-dialog" aria-labelledby="organization-dialog-title">
+    <form id="organization-form" method="dialog">
+      <div class="dialog-header">
+        <h2 id="organization-dialog-title">Organisation bearbeiten</h2>
+
+        <button class="icon-button" type="button" aria-label="Dialog schließen" data-close-dialog>
+          ×
+        </button>
+      </div>
+
+      <div class="form-grid">
+        <label class="form-full">
+          Name
+          <input id="organization-name" type="text" required placeholder="z. B. Musikverein Harmonie e.V.">
+        </label>
+
+        <label>
+          Version
+          <input
+            id="organization-version"
+            type="text"
+            pattern="\d+\.\d+\.\d+"
+            title="Format x.y.z, z. B. 1.2.0"
+            placeholder="z. B. 1.2.0"
+          >
+        </label>
+
+        <label>
+          Oberstes Organ vorhanden
+          <select id="organization-has-top-organ">
+            <option value="true">ja</option>
+            <option value="false">nein</option>
+          </select>
+        </label>
+
+        <label>
+          <span data-term-text="{board} vorhanden">Vorstand vorhanden</span>
+          <select id="organization-has-board">
+            <option value="true">ja</option>
+            <option value="false">nein</option>
+          </select>
+        </label>
+
+        <label class="form-full">
+          Oberstes Organ: Titel
+          <input id="organization-root-title" type="text" placeholder="z. B. Mitgliederversammlung">
+        </label>
+
+        <label class="form-full">
+          Oberstes Organ: Beschreibung
+          <textarea id="organization-root-description" rows="2"></textarea>
+        </label>
+
+        <label class="form-full">
+          <span data-term-text="{board}: Titel">Vorstand: Titel</span>
+          <input id="organization-board-title" type="text" placeholder="z. B. Vorstand">
+        </label>
+
+        <label class="form-full">
+          <span data-term-text="{board}: Beschreibung">Vorstand: Beschreibung</span>
+          <textarea id="organization-board-description" rows="2"></textarea>
+        </label>
+
+        <h3 class="form-full">Begriffe</h3>
+        <p class="form-full form-hint">Leer lassen, um den Standardbegriff zu verwenden.</p>
+
+        <label>
+          Bezeichnung Vorstandsamt
+          <input id="organization-term-board-role" type="text" placeholder="Vorstandsamt">
+        </label>
+
+        <label>
+          Bezeichnung Ressort
+          <input id="organization-term-portfolio" type="text" placeholder="Ressort">
+        </label>
+
+        <div class="form-full form-field">
+          <span class="form-label">Logo</span>
+
+          <div class="photo-field">
+            <img id="organization-logo-preview" class="org-logo" alt="" hidden>
+
+            <div class="photo-inputs">
+              <input
+                id="organization-logo"
+                type="text"
+                placeholder="Bild-URL oder Pfad, z. B. data/logo.png"
+                aria-label="Logo-URL oder Pfad"
+              >
+
+              <div class="photo-buttons">
+                <label class="button file-button">
+                  Logo hochladen
+                  <input id="organization-logo-file" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+                </label>
+
+                <button id="organization-logo-remove" class="button" type="button">
+                  Logo entfernen
+                </button>
+              </div>
+
+              <p class="form-hint">
+                Hochgeladene Logos werden auf max. 512 px verkleinert und
+                direkt in der JSON-Datei gespeichert.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dialog-actions">
+        <button class="button" type="button" data-close-dialog>
+          Abbrechen
+        </button>
+
+        <button id="organization-submit-button" class="button button-primary" type="submit">
+          Speichern
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Dialog: Details -->
+  <dialog id="detail-dialog" aria-labelledby="detail-title">
+    <div class="dialog-body">
+      <div class="dialog-header">
+        <h2 id="detail-title"></h2>
+
+        <button class="icon-button" type="button" aria-label="Dialog schließen" data-close-dialog>
+          ×
+        </button>
+      </div>
+
+      <div id="detail-content"></div>
+    </div>
+  </dialog>
+
+  <!-- Dialog: Drucken -->
+  <dialog id="print-dialog" aria-labelledby="print-dialog-title">
+    <form id="print-form" method="dialog">
+      <div class="dialog-header">
+        <h2 id="print-dialog-title">Drucken einrichten</h2>
+
+        <button class="icon-button" type="button" aria-label="Dialog schließen" data-close-dialog>
+          ×
+        </button>
+      </div>
+
+      <div class="print-options">
+        <fieldset>
+          <legend>Umfang</legend>
+
+          <label>
+            <input type="radio" name="print-scope" value="full" checked>
+            Vollständig (mit Aufgaben und Details)
+          </label>
+
+          <label>
+            <input type="radio" name="print-scope" value="poster">
+            Aushang (oberste Ebenen, ohne Details)
+          </label>
+        </fieldset>
+      </div>
+
+      <div class="dialog-actions">
+        <button class="button" type="button" data-close-dialog>
+          Abbrechen
+        </button>
+
+        <button id="print-submit-button" class="button button-primary" type="submit">
+          Drucken / PDF
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <noscript>
+    <div class="message message-error">
+      Diese Seite benötigt JavaScript, um die Daten aus der JSON-Datei
+      darzustellen.
+    </div>
+  </noscript>
+</body>
+</html>

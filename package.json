@@ -1,0 +1,15 @@
+{
+  "name": "who-does-what",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Organisations- und Kompetenzstruktur als statische Webseite",
+  "scripts": {
+    "test": "npm run test:data && npm run test:e2e",
+    "test:data": "node --test tests/data.test.mjs",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.47.0",
+    "http-server": "^14.1.1"
+  }
+}

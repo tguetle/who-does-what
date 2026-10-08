@@ -1,0 +1,161 @@
+{
+  "organization": {
+    "name": "Schachklub Springer Musterstadt e.V.",
+    "updated": "2026-10-08",
+    "version": "1.0.0",
+    "boardTitle": "Vorstand",
+    "boardDescription": "Gesamtverantwortung für Verein, Finanzen und Spielbetrieb"
+  },
+  "root": {
+    "title": "Mitgliederversammlung",
+    "description": "Oberstes Beschlussorgan des Vereins"
+  },
+  "people": [
+    {
+      "id": "p-helga-zug",
+      "name": "Helga Zug",
+      "photo": "data/assets/demo-fotos/p-erika-musterfrau.svg",
+      "email": "helga.zug@schachklub.example",
+      "phone": "+49 30 555 0101",
+      "consent": true
+    },
+    {
+      "id": "p-bernd-turm",
+      "name": "Bernd Turm",
+      "email": "bernd.turm@schachklub.example",
+      "consent": true
+    },
+    {
+      "id": "p-sabine-bauer",
+      "name": "Sabine Bauer",
+      "email": "kasse@schachklub.example",
+      "consent": true
+    },
+    {
+      "id": "p-klaus-laeufer",
+      "name": "Klaus Läufer",
+      "consent": true
+    },
+    {
+      "id": "p-nina-dame",
+      "name": "Nina Dame",
+      "consent": true,
+      "note": "Zugleich Jugendtrainerin."
+    },
+    {
+      "id": "p-oskar-springer",
+      "name": "Oskar Springer"
+    },
+    {
+      "id": "p-mira-matt",
+      "name": "Mira Matt",
+      "consent": true
+    },
+    {
+      "id": "p-felix-remis",
+      "name": "Felix Remis"
+    },
+    {
+      "id": "p-greta-gambit",
+      "name": "Greta Gambit",
+      "consent": true
+    },
+    {
+      "id": "p-ole-rochade",
+      "name": "Ole Rochade"
+    }
+  ],
+  "board": [
+    {
+      "id": "board-1",
+      "title": "1. Vorsitzende",
+      "personIds": ["p-helga-zug"],
+      "termUntil": 2028,
+      "source": "Satzung § 8"
+    },
+    {
+      "id": "board-2",
+      "title": "Schatzmeisterin",
+      "personIds": ["p-sabine-bauer"],
+      "termUntil": 2027,
+      "source": "Satzung § 8"
+    },
+    {
+      "id": "board-3",
+      "title": "Sportwart",
+      "personIds": ["p-bernd-turm"],
+      "termUntil": 2028,
+      "source": "Satzung § 8"
+    }
+  ],
+  "sections": [
+    {
+      "id": "audit",
+      "title": "Kassenprüfung",
+      "icon": "🔍",
+      "type": "assembly",
+      "description": "Von der Mitgliederversammlung gewählt",
+      "roles": [
+        {
+          "id": "auditor",
+          "title": "Kassenprüfer",
+          "personIds": ["p-mira-matt", "p-greta-gambit"],
+          "status": "official",
+          "appointment": "elected",
+          "termUntil": 2027,
+          "tasks": "Prüfung der Kassenführung und Bericht an die Mitgliederversammlung."
+        }
+      ]
+    },
+    {
+      "id": "competition",
+      "title": "Spielbetrieb",
+      "icon": "♞",
+      "type": "internal",
+      "boardMemberId": "board-3",
+      "description": "Mannschaften, Ligabetrieb und Turniere",
+      "email": "spielbetrieb@schachklub.example",
+      "roles": [
+        {
+          "id": "team-captain",
+          "title": "Mannschaftsführer 1. Mannschaft",
+          "personIds": ["p-klaus-laeufer"],
+          "deputyIds": ["p-felix-remis"],
+          "status": "official",
+          "appointment": "appointed",
+          "tasks": "Aufstellung, Ligameldungen und Terminabsprachen.",
+          "autonomy": "Aufstellung innerhalb der Spielordnung.",
+          "approval": "Mannschaftsrückzüge und Sonderausgaben."
+        },
+        {
+          "id": "tournament-lead",
+          "title": "Turnierleitung",
+          "personIds": [],
+          "personNote": "Vakant – wird derzeit vom Sportwart übernommen",
+          "status": "vacant",
+          "effort": "ca. 3 Std. pro Monat",
+          "tasks": "Organisation des Vereinsturniers im Herbst."
+        }
+      ]
+    },
+    {
+      "id": "youth",
+      "title": "Jugend",
+      "icon": "🌟",
+      "type": "internal",
+      "boardMemberId": "board-1",
+      "description": "Schach-AG und Jugendtraining",
+      "email": "jugend@schachklub.example",
+      "roles": [
+        {
+          "id": "youth-training",
+          "title": "Jugendtrainerin",
+          "personIds": ["p-nina-dame"],
+          "status": "official",
+          "tasks": "Training der Jugendlichen (8–16 Jahre). Training: Mi 17:30–19:00.",
+          "seeking": true
+        }
+      ]
+    }
+  ]
+}

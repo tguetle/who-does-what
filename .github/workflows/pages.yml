@@ -1,0 +1,50 @@
+name: Pages
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Code auschecken
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build-Info schreiben
+        run: |
+          VERSION=$(git describe --tags --always)
+          TAG=$(git tag --points-at HEAD --list 'v*' | head -n 1)
+          TAGGED=false
+          if [ -n "$TAG" ]; then TAGGED=true; fi
+          printf '{"version":"%s","tagged":%s}\n' "$VERSION" "$TAGGED" > build.json
+
+      - name: Pages einrichten
+        uses: actions/configure-pages@v5
+
+      - name: Seite als Artefakt hochladen
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Auf GitHub Pages veroeffentlichen
+        id: deployment
+        uses: actions/deploy-pages@v4

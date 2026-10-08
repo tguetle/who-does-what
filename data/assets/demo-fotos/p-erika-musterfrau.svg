@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Demofoto">
+  <rect width="200" height="200" fill="#b5838d"/>
+  <path d="M56 90C50 40 150 40 144 90L152 160H48Z" fill="#8a5a2b"/>
+  <path d="M40 200C40 150 65 128 100 128S160 150 160 200Z" fill="#6d597a"/>
+  <circle cx="100" cy="82" r="36" fill="#e8c4a8"/>
+  <path d="M64 76C64 52 136 52 136 76C124 66 110 60 100 60S76 66 64 76Z" fill="#8a5a2b"/>
+</svg>

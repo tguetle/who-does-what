@@ -1,0 +1,82 @@
+{
+  "organization": {
+    "name": "Musikverein Harmonie Musterdorf e.V.",
+    "updated": "2026-10-08",
+    "version": "1.0.0",
+    "boardTitle": "Vorstand",
+    "boardDescription": "Leitung des Vereins"
+  },
+  "root": {
+    "title": "Mitgliederversammlung",
+    "description": "Oberstes Beschlussorgan"
+  },
+  "people": [
+    {
+      "id": "p-anna-muster",
+      "name": "Anna Muster",
+      "email": "anna.muster@musterverein.example",
+      "consent": true
+    },
+    {
+      "id": "p-tom-beispiel",
+      "name": "Tom Beispiel",
+      "consent": true
+    },
+    {
+      "id": "p-lisa-probe",
+      "name": "Lisa Probe",
+      "consent": true
+    },
+    {
+      "id": "p-jonas-demo",
+      "name": "Jonas Demo",
+      "consent": true
+    }
+  ],
+  "board": [
+    {
+      "id": "board-1",
+      "title": "1. Vorsitzende",
+      "personIds": ["p-anna-muster"]
+    },
+    {
+      "id": "board-2",
+      "title": "Kassier",
+      "personIds": ["p-tom-beispiel"]
+    }
+  ],
+  "sections": [
+    {
+      "id": "music-direction",
+      "title": "Musikalische Leitung",
+      "icon": "🎼",
+      "type": "internal",
+      "description": "Proben und Konzerte",
+      "roles": [
+        {
+          "id": "conductor",
+          "title": "Dirigentin",
+          "personIds": ["p-lisa-probe"],
+          "status": "official",
+          "tasks": "Leitung der Proben und Konzerte."
+        }
+      ]
+    },
+    {
+      "id": "events",
+      "title": "Veranstaltungen",
+      "icon": "🎉",
+      "type": "internal",
+      "description": "Konzerte und Vereinsfeste",
+      "roles": [
+        {
+          "id": "festival-organization",
+          "title": "Festorganisation",
+          "personIds": ["p-jonas-demo"],
+          "status": "official",
+          "tasks": "Planung und Durchführung des Sommerfests."
+        }
+      ]
+    }
+  ]
+}

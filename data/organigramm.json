@@ -1,0 +1,320 @@
+{
+  "organization": {
+    "name": "Muster Metallbau GmbH",
+    "updated": "2026-10-08",
+    "version": "1.0.0",
+    "boardTitle": "Geschäftsführung",
+    "boardDescription": "Unternehmensführung, Strategie und Budgetverantwortung"
+  },
+  "root": {
+    "title": "Gesellschafterversammlung",
+    "description": "Oberstes Organ der Gesellschaft"
+  },
+  "people": [
+    {
+      "id": "p-eva-werk",
+      "name": "Eva Werk",
+      "photo": "data/assets/demo-fotos/p-erika-musterfrau.svg",
+      "email": "eva.werk@muster-metallbau.example",
+      "phone": "+49 30 700 0001",
+      "consent": true
+    },
+    {
+      "id": "p-jan-schraube",
+      "name": "Jan Schraube",
+      "email": "jan.schraube@muster-metallbau.example",
+      "phone": "+49 30 700 0002",
+      "consent": true
+    },
+    {
+      "id": "p-mona-finanz",
+      "name": "Mona Finanz",
+      "email": "finanzen@muster-metallbau.example",
+      "consent": true
+    },
+    {
+      "id": "p-rolf-technik",
+      "name": "Rolf Technik",
+      "consent": true
+    },
+    {
+      "id": "p-ina-personal",
+      "name": "Ina Personal",
+      "email": "personal@muster-metallbau.example",
+      "consent": true
+    },
+    {
+      "id": "p-lars-schweiss",
+      "name": "Lars Schweiß",
+      "consent": true
+    },
+    {
+      "id": "p-tina-zeichnung",
+      "name": "Tina Zeichnung",
+      "consent": true
+    },
+    {
+      "id": "p-max-montage",
+      "name": "Max Montage"
+    },
+    {
+      "id": "p-sara-service",
+      "name": "Sara Service",
+      "phone": "+49 30 700 0009",
+      "note": "Keine Einwilligung zur Veröffentlichung – Kontaktdaten nur intern sichtbar."
+    },
+    {
+      "id": "p-paul-qualitaet",
+      "name": "Paul Qualität",
+      "consent": true
+    },
+    {
+      "id": "p-julia-einkauf",
+      "name": "Julia Einkauf",
+      "consent": true
+    },
+    {
+      "id": "p-emil-lager",
+      "name": "Emil Lager"
+    },
+    {
+      "id": "p-hanna-vertrieb",
+      "name": "Hanna Vertrieb",
+      "email": "vertrieb@muster-metallbau.example",
+      "consent": true
+    },
+    {
+      "id": "p-tim-azubi",
+      "name": "Tim Azubi"
+    },
+    {
+      "id": "p-nora-azubi",
+      "name": "Nora Azubi"
+    },
+    {
+      "id": "p-kai-schweisser",
+      "name": "Kai Schweißer"
+    }
+  ],
+  "board": [
+    {
+      "id": "board-1",
+      "title": "Geschäftsführer",
+      "personIds": ["p-eva-werk"],
+      "appointment": "elected",
+      "termUntil": 2029,
+      "source": "Gesellschaftsvertrag § 6"
+    },
+    {
+      "id": "board-2",
+      "title": "Prokurist Finanzen",
+      "personIds": ["p-mona-finanz"],
+      "appointment": "appointed",
+      "termUntil": 2028,
+      "source": "Prokura vom 01.03.2026"
+    },
+    {
+      "id": "board-3",
+      "title": "Technischer Leiter",
+      "personIds": ["p-rolf-technik"],
+      "appointment": "appointed",
+      "termUntil": 2028,
+      "source": "Vorstandsbeschluss 02/2026"
+    }
+  ],
+  "sections": [
+    {
+      "id": "supervisory-board",
+      "title": "Gesellschafterausschuss",
+      "icon": "🔍",
+      "type": "assembly",
+      "description": "Kontrolle der Geschäftsführung, unabhängig vom operativen Geschäft",
+      "roles": [
+        {
+          "id": "supervisory-chair",
+          "title": "Vorsitz Gesellschafterausschuss",
+          "personIds": ["p-paul-qualitaet"],
+          "deputyIds": ["p-julia-einkauf"],
+          "status": "official",
+          "appointment": "elected",
+          "termUntil": 2027,
+          "tasks": "Überwachung der Geschäftsführung und Prüfung des Jahresabschlusses.",
+          "autonomy": "Unabhängige Prüfung ohne Weisungsbindung.",
+          "source": "Gesellschaftsvertrag § 10"
+        }
+      ]
+    },
+    {
+      "id": "production",
+      "title": "Fertigung",
+      "icon": "⚙️",
+      "type": "internal",
+      "boardMemberId": "board-3",
+      "description": "Produktion, Schweißtechnik und Montage",
+      "email": "fertigung@muster-metallbau.example",
+      "roles": [
+        {
+          "id": "production-lead",
+          "title": "Fertigungsleitung",
+          "personIds": ["p-rolf-technik"],
+          "deputyIds": ["p-lars-schweiss"],
+          "status": "official",
+          "appointment": "appointed",
+          "termUntil": 2028,
+          "spendingLimit": 5000,
+          "tasks": "Steuerung der Fertigungsaufträge und Kapazitätsplanung.",
+          "autonomy": "Personaleinsatz und Arbeitsabläufe in der Fertigung.",
+          "approval": "Investitionen über dem Limit und neue Lieferanten.",
+          "decisions": {
+            "budget": "self",
+            "contracts": "board",
+            "staff": "board",
+            "sport": "self",
+            "facility": "board"
+          },
+          "effort": "Vollzeit"
+        },
+        {
+          "id": "welding",
+          "title": "Schweißaufsicht",
+          "personIds": ["p-lars-schweiss", "p-kai-schweisser"],
+          "personLabels": {
+            "p-lars-schweiss": "Schweißfachmann",
+            "p-kai-schweisser": "Schweißer"
+          },
+          "status": "official",
+          "reportsTo": "production-lead",
+          "tasks": "Abnahme der Schweißnähte nach DIN EN ISO 3834.",
+          "approval": "Freigabe sicherheitsrelevanter Bauteile."
+        },
+        {
+          "id": "installation",
+          "title": "Montageteam",
+          "personIds": ["p-max-montage", "p-emil-lager"],
+          "status": "official",
+          "reportsTo": "production-lead",
+          "tasks": "Montage beim Kunden und Einsatzplanung vor Ort.",
+          "seeking": true
+        }
+      ]
+    },
+    {
+      "id": "quality",
+      "title": "Qualitätssicherung",
+      "icon": "✅",
+      "type": "internal",
+      "boardMemberId": "board-1",
+      "description": "Prüfungen, Zertifizierung und Reklamationen",
+      "email": "qualitaet@muster-metallbau.example",
+      "roles": [
+        {
+          "id": "quality-lead",
+          "title": "Qualitätsmanagementbeauftragter",
+          "personIds": ["p-paul-qualitaet"],
+          "status": "official",
+          "appointment": "appointed",
+          "termUntil": 2028,
+          "tasks": "Pflege des QM-Systems und Vorbereitung der Audits.",
+          "approval": "Stopp der Auslieferung bei Qualitätsmängeln.",
+          "decisions": {
+            "sport": "self",
+            "communication": "self"
+          }
+        }
+      ]
+    },
+    {
+      "id": "administration",
+      "title": "Verwaltung und Einkauf",
+      "icon": "📋",
+      "type": "internal",
+      "boardMemberId": "board-2",
+      "description": "Finanzen, Personal und Beschaffung",
+      "email": "verwaltung@muster-metallbau.example",
+      "roles": [
+        {
+          "id": "purchasing",
+          "title": "Einkauf",
+          "personIds": ["p-julia-einkauf"],
+          "status": "official",
+          "spendingLimit": 2000,
+          "tasks": "Beschaffung von Material und Rahmenverträge mit Lieferanten.",
+          "approval": "Bestellungen über dem Limit und neue Rahmenverträge."
+        },
+        {
+          "id": "hr",
+          "title": "Personalwesen",
+          "personIds": ["p-ina-personal"],
+          "deputyIds": ["p-mona-finanz"],
+          "status": "official",
+          "tasks": "Einstellungen, Lohnabrechnung und Ausbildungsplätze.",
+          "topics": ["Bewerbung", "Ausbildung bei uns"]
+        },
+        {
+          "id": "apprenticeship",
+          "title": "Ausbildungsbetreuung",
+          "personIds": ["p-tim-azubi", "p-nora-azubi"],
+          "personLabels": {
+            "p-tim-azubi": "Azubi Metallbau",
+            "p-nora-azubi": "Azubi Konstruktion"
+          },
+          "status": "official",
+          "reportsTo": "hr",
+          "tasks": "Betreuung der Auszubildenden im ersten Lehrjahr."
+        }
+      ]
+    },
+    {
+      "id": "sales",
+      "title": "Vertrieb und Kundenservice",
+      "icon": "🤝",
+      "type": "internal",
+      "boardMemberId": "board-1",
+      "description": "Angebote, Kundenkontakt und Service",
+      "email": "vertrieb@muster-metallbau.example",
+      "roles": [
+        {
+          "id": "sales-lead",
+          "title": "Vertriebsleitung",
+          "personIds": ["p-hanna-vertrieb"],
+          "status": "official",
+          "appointment": "appointed",
+          "spendingLimit": 1000,
+          "tasks": "Angebotserstellung und Pflege der Kundenbeziehungen.",
+          "decisions": {
+            "budget": "self",
+            "contracts": "board",
+            "sport": "self"
+          }
+        },
+        {
+          "id": "customer-service",
+          "title": "Kundenservice",
+          "personIds": ["p-sara-service"],
+          "status": "vacant",
+          "personNote": "Stelle vakant – Besetzung ab Q1 geplant",
+          "reportsTo": "sales-lead",
+          "tasks": "Reklamationen, Terminabsprachen und Nachbetreuung."
+        }
+      ]
+    },
+    {
+      "id": "subsidiary",
+      "title": "Tochtergesellschaft Muster Stahlbau",
+      "icon": "🏭",
+      "type": "partner",
+      "description": "Eigenständige Gesellschaft mit eigener Geschäftsführung",
+      "email": "info@muster-stahlbau.example",
+      "roles": [
+        {
+          "id": "subsidiary-management",
+          "title": "Geschäftsführung Stahlbau",
+          "personIds": ["p-rolf-technik"],
+          "status": "official",
+          "tasks": "Operative Leitung der Tochtergesellschaft.",
+          "note": "Eigenständige Gesellschaft; keine interne Abteilung."
+        }
+      ]
+    }
+  ]
+}
