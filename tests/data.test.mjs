@@ -52,7 +52,16 @@ for (const file of files) {
   const label = path.relative(root, file);
 
   test(`${label} ist konsistent`, async () => {
-    const data = JSON.parse(await readFile(file, "utf8"));
+    const raw = JSON.parse(await readFile(file, "utf8"));
+
+    // Encrypted files only carry an envelope; their content is checked after decryption in the app.
+    if (raw.format === "who-does-what-encrypted") {
+      assert.equal(raw.version, 1, "verschlüsselte Datei: version muss 1 sein");
+      assert.ok(raw.kdf && raw.cipher && raw.data, "verschlüsselte Datei: Envelope unvollständig");
+      return;
+    }
+
+    const data = raw;
 
     assert.ok(data.organization?.name, "organization.name fehlt");
     if (data.organization.logo !== undefined) {

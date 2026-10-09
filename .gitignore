@@ -5,6 +5,7 @@ blob-report/
 
 # Lokal behalten, nicht im Repo (echte Personendaten bzw. Arbeitsdateien)
 data/organigramm_ASV.json
+data/organigramm_ASV.enc.json
 data/organigramm-backup.json
 data/organigram.json
 export/

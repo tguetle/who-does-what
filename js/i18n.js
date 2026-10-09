@@ -300,6 +300,18 @@ const LANGUAGES = {
 
       // Hinweise und Fehler
       "Lokales Speichern fehlgeschlagen – vermutlich ist der Speicher voll (z. B. durch viele Fotos). Bitte JSON herunterladen.": "Local save failed – storage is probably full (e.g. because of many photos). Please download the JSON.",
+      "Verschlüsselt exportieren": "Export encrypted",
+      "Organigramm entsperren": "Unlock organigram",
+      "Diese Datei ist verschlüsselt. Bitte die Passphrase eingeben.": "This file is encrypted. Please enter the passphrase.",
+      "Passphrase falsch oder Datei beschädigt. Bitte erneut eingeben.": "Wrong passphrase or damaged file. Please try again.",
+      "Passphrase": "Passphrase",
+      "Passphrase wiederholen": "Repeat passphrase",
+      "Zufalls-Passphrase erzeugen": "Generate random passphrase",
+      "Weiter": "Continue",
+      "Die Passphrasen stimmen nicht überein.": "The passphrases do not match.",
+      "Mindestens {length} Zeichen. Die Passphrase wird nicht in der Datei gespeichert und muss auf einem anderen Weg weitergegeben werden.": "At least {length} characters. The passphrase is not stored in the file and must be shared through a separate channel.",
+      "Das Organigramm wurde nicht entsperrt.": "The organigram was not unlocked.",
+      "Verschlüsselte Datei wurde heruntergeladen.": "Encrypted file downloaded.",
       "Lokale bearbeitete Version · Datenstand {updated}": "Locally edited version · data status {updated}",
       "Version aus dem GitHub-Repository · Datenstand {updated}": "Version from the GitHub repository · data status {updated}",
       " · Version {version}": " · Version {version}",
