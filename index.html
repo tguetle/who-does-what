@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="./css/styles.css">
   <script src="./js/build-info.js"></script>
   <script src="./js/i18n.js" defer></script>
+  <script src="./js/crypto.js" defer></script>
   <script src="./js/app.js" defer></script>
   <script src="./js/views.js" defer></script>
   <script src="./js/editor.js" defer></script>
@@ -83,6 +84,9 @@
       <div class="toolbar-group" role="group" aria-label="Daten" data-internal>
         <button id="export-button" class="button" type="button">
           JSON herunterladen
+        </button>
+        <button id="encrypted-export-button" class="button" type="button">
+          Verschlüsselt exportieren
         </button>
         <label class="button file-button">
           JSON importieren
@@ -757,6 +761,49 @@
 
         <button id="print-submit-button" class="button button-primary" type="submit">
           Drucken / PDF
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Dialog: Passphrase für verschlüsselte Dateien -->
+  <dialog id="passphrase-dialog" aria-labelledby="passphrase-dialog-title">
+    <form id="passphrase-form" method="dialog">
+      <div class="dialog-header">
+        <h2 id="passphrase-dialog-title"></h2>
+
+        <button class="icon-button" type="button" aria-label="Dialog schließen" data-close-dialog>
+          ×
+        </button>
+      </div>
+
+      <p id="passphrase-message"></p>
+
+      <div class="form-grid">
+        <label class="form-full">
+          Passphrase
+          <input id="passphrase-input" type="password" autocomplete="off" required>
+        </label>
+
+        <label class="form-full" id="passphrase-confirm-field" hidden>
+          Passphrase wiederholen
+          <input id="passphrase-confirm" type="text" autocomplete="off">
+        </label>
+
+        <div class="form-full">
+          <button id="passphrase-generate-button" class="button" type="button" hidden>
+            Zufalls-Passphrase erzeugen
+          </button>
+        </div>
+      </div>
+
+      <div class="dialog-actions">
+        <button class="button" type="button" data-close-dialog>
+          Abbrechen
+        </button>
+
+        <button class="button button-primary" type="submit" value="ok">
+          Weiter
         </button>
       </div>
     </form>

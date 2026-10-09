@@ -6,7 +6,7 @@
   "description": "Organisations- und Kompetenzstruktur als statische Webseite",
   "scripts": {
     "test": "npm run test:data && npm run test:e2e",
-    "test:data": "node --test tests/data.test.mjs",
+    "test:data": "node --test tests/data.test.mjs tests/crypto.test.mjs",
     "test:e2e": "playwright test"
   },
   "devDependencies": {

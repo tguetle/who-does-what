@@ -65,6 +65,20 @@ Fotos und Logos werden als relative Pfade (z. B. `data/assets/demo-fotos/...`), 
 
 Änderungen werden im `localStorage` des Browsers gespeichert. Die Schlüssel sind an den Pfad der Seite gebunden, damit mehrere GitHub-Pages-Projekte desselben Nutzers sich nicht gegenseitig überschreiben. Lokale Änderungen sind nur in diesem Browser sichtbar. Vor dem Zurücksetzen oder Wechsel des Pfads sollte exportiert werden.
 
+## Verschlüsselte Weitergabe
+
+Ein Organigramm kann ohne Server passwortgeschützt weitergegeben werden: Im Menü „Verschlüsselt exportieren“ wird eine Datei `organigramm.enc.json` erzeugt. Die Verschlüsselung läuft vollständig im Browser (WebCrypto).
+
+- Schlüsselableitung: PBKDF2-SHA-256, 600.000 Iterationen, 16 Byte Salt pro Datei.
+- Verschlüsselung: AES-256-GCM mit zufälligem 12 Byte IV.
+- Die Passphrase wird nicht in der Datei gespeichert. Sie sollte über einen separaten Kanal mitgeteilt werden. Auf Wunsch erzeugt die App eine Zufalls-Passphrase.
+- Beim Öffnen einer verschlüsselten Datei (Import oder Seitenaufruf) fragt die App nach der Passphrase. Die entschlüsselten Daten bleiben nur in `sessionStorage` des Tabs und werden nicht im `localStorage` abgelegt.
+- Die Mindestlänge beträgt 16 Zeichen.
+
+Grenzen: Eine einmal weitergegebene Datei lässt sich nicht widerrufen. Wer die Passphrase kennt, kann die Daten lesen. Verschlüsselte Dateien, die in ein Git-Repository committet wurden, bleiben in der Historie erhalten. Die Passphrase kann nicht zurückgesetzt werden; ohne sie sind die Daten nicht wiederherstellbar.
+
+Das Format steht in `js/crypto.js`. Die Datei `data/organigramm.json` ist die öffentliche Demo und bleibt unverschlüsselt.
+
 ## Tests
 
 ```

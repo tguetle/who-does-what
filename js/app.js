@@ -6,6 +6,9 @@ const TEMPLATE_URL = "./data/template.json";
 const STORAGE_PREFIX = `who-does-what:${window.location.pathname}`;
 const STORAGE_KEY = `${STORAGE_PREFIX}-v2`;
 const BASE_HASH_KEY = `${STORAGE_PREFIX}-basis`;
+// Decrypted data of an encrypted organigram lives only in this tab's sessionStorage.
+const SESSION_KEY = `${STORAGE_PREFIX}-sitzung`;
+const MIN_PASSPHRASE_LENGTH = 16;
 
 // Presentation mode only – the JSON file itself stays publicly readable.
 const INTERNAL_MODE = new URLSearchParams(window.location.search).has(
@@ -15,6 +18,9 @@ const INTERNAL_MODE = new URLSearchParams(window.location.search).has(
 let data = null;
 let showingLocalVersion = false;
 let repositoryHash = "";
+let encryptedSession = false;
+let passphraseResolve = null;
+let passphraseSetMode = false;
 let currentView = "organigramm";
 let statusFilter = "all";
 let personSort = "count";
@@ -190,14 +196,27 @@ async function init() {
     }
 
     const repositoryText = await response.text();
-    repositoryHash = hashText(repositoryText);
-    repositoryData = prepareData(JSON.parse(repositoryText));
+    const repositoryValue = JSON.parse(repositoryText);
+
+    if (isEncryptedEnvelope(repositoryValue)) {
+      encryptedSession = true;
+      repositoryHash = "";
+      repositoryData =
+        loadSessionData() || (await unlockEnvelope(repositoryValue));
+
+      if (!repositoryData) {
+        throw new Error(t("Das Organigramm wurde nicht entsperrt."));
+      }
+    } else {
+      repositoryHash = hashText(repositoryText);
+      repositoryData = prepareData(repositoryValue);
+    }
   } catch (error) {
     console.error(error);
     loadError = error;
   }
 
-  data = loadLocalData() || repositoryData;
+  data = encryptedSession ? repositoryData : loadLocalData() || repositoryData;
 
   if (!data) {
     showLoadError(loadError);
@@ -235,6 +254,24 @@ function loadLocalData() {
   }
 }
 
+function loadSessionData() {
+  const saved = sessionStorage.getItem(SESSION_KEY);
+
+  if (!saved) {
+    return null;
+  }
+
+  try {
+    const value = prepareData(JSON.parse(saved));
+    showingLocalVersion = true;
+    return value;
+  } catch (error) {
+    console.warn("Sitzungsdaten waren ungültig:", error);
+    sessionStorage.removeItem(SESSION_KEY);
+    return null;
+  }
+}
+
 function cacheElements() {
   const byId = (id) => document.getElementById(id);
 
@@ -257,7 +294,16 @@ function cacheElements() {
     detailContent: byId("detail-content"),
 
     exportButton: byId("export-button"),
+    encryptedExportButton: byId("encrypted-export-button"),
     importInput: byId("import-input"),
+    passphraseDialog: byId("passphrase-dialog"),
+    passphraseDialogTitle: byId("passphrase-dialog-title"),
+    passphraseMessage: byId("passphrase-message"),
+    passphraseForm: byId("passphrase-form"),
+    passphraseInput: byId("passphrase-input"),
+    passphraseConfirmField: byId("passphrase-confirm-field"),
+    passphraseConfirm: byId("passphrase-confirm"),
+    passphraseGenerateButton: byId("passphrase-generate-button"),
     printButton: byId("print-button"),
     printDialog: byId("print-dialog"),
     printForm: byId("print-form"),
@@ -287,6 +333,12 @@ function bindEvents() {
   });
 
   elements.exportButton.addEventListener("click", exportJSON);
+  elements.encryptedExportButton.addEventListener("click", exportEncryptedJSON);
+  elements.passphraseDialog.addEventListener("close", resolvePassphrase);
+  elements.passphraseForm.addEventListener("submit", checkPassphraseMatch);
+  elements.passphraseInput.addEventListener("input", clearPassphraseMismatch);
+  elements.passphraseConfirm.addEventListener("input", clearPassphraseMismatch);
+  elements.passphraseGenerateButton.addEventListener("click", fillGeneratedPassphrase);
   elements.importInput.addEventListener("change", importJSON);
   elements.printButton.addEventListener("click", () => showDialog(elements.printDialog));
   elements.printForm.addEventListener("submit", (event) => {
@@ -694,7 +746,11 @@ function persist() {
   data.organization.updated = new Date().toISOString().slice(0, 10);
 
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    if (encryptedSession) {
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(data));
+    } else {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
   } catch (error) {
     console.error(error);
     showMessage(
@@ -705,7 +761,7 @@ function persist() {
   }
 
   // Remember which repository version the local edits are based on.
-  if (!showingLocalVersion) {
+  if (!encryptedSession && !showingLocalVersion) {
     localStorage.setItem(BASE_HASH_KEY, repositoryHash);
   }
 
@@ -756,7 +812,31 @@ function updateRepositoryWarning() {
 }
 
 function exportJSON() {
-  const content = JSON.stringify(data, null, 2);
+  downloadText(JSON.stringify(data, null, 2), "organigramm.json");
+
+  showMessage(
+    t("JSON wurde heruntergeladen. Ersetze damit bei Bedarf data/organigramm.json im Repository.")
+  );
+}
+
+async function exportEncryptedJSON() {
+  const passphrase = await askPassphrase({
+    title: t("Verschlüsselt exportieren"),
+    message: t("Mindestens {length} Zeichen. Die Passphrase wird nicht in der Datei gespeichert und muss auf einem anderen Weg weitergegeben werden.", { length: MIN_PASSPHRASE_LENGTH }),
+    confirm: true
+  });
+
+  if (passphrase === null) {
+    return;
+  }
+
+  const envelope = await encryptData(data, passphrase);
+  downloadText(JSON.stringify(envelope, null, 2), "organigramm.enc.json");
+
+  showMessage(t("Verschlüsselte Datei wurde heruntergeladen."));
+}
+
+function downloadText(content, filename) {
   const blob = new Blob([content], {
     type: "application/json;charset=utf-8"
   });
@@ -765,16 +845,12 @@ function exportJSON() {
   const link = document.createElement("a");
 
   link.href = url;
-  link.download = "organigramm.json";
+  link.download = filename;
   document.body.append(link);
   link.click();
   link.remove();
 
   URL.revokeObjectURL(url);
-
-  showMessage(
-    t("JSON wurde heruntergeladen. Ersetze damit bei Bedarf data/organigramm.json im Repository.")
-  );
 }
 
 async function importJSON(event) {
@@ -785,10 +861,18 @@ async function importJSON(event) {
   }
 
   try {
-    const text = await file.text();
-    const importedData = prepareData(JSON.parse(text));
+    const value = JSON.parse(await file.text());
+    const importedEncrypted = isEncryptedEnvelope(value);
+    const importedData = importedEncrypted
+      ? await unlockEnvelope(value)
+      : prepareData(value);
+
+    if (!importedData) {
+      return;
+    }
 
     data = importedData;
+    encryptedSession = importedEncrypted;
     persist();
     render();
     updateOrganizationName();
@@ -816,6 +900,7 @@ function resetLocalData() {
 
   localStorage.removeItem(STORAGE_KEY);
   localStorage.removeItem(BASE_HASH_KEY);
+  sessionStorage.removeItem(SESSION_KEY);
   window.location.reload();
 }
 
@@ -1013,6 +1098,88 @@ function applyPrintPage(contentWidth, contentHeight) {
 function showDialog(dialog) {
   if (!dialog.open) {
     dialog.showModal();
+  }
+}
+
+// Resolves with the entered passphrase, or null if the dialog was cancelled.
+function askPassphrase({ title, message, confirm = false }) {
+  elements.passphraseDialogTitle.textContent = title;
+  elements.passphraseMessage.textContent = message;
+  elements.passphraseForm.reset();
+  elements.passphraseDialog.returnValue = "";
+
+  passphraseSetMode = confirm;
+  elements.passphraseConfirmField.hidden = !confirm;
+  elements.passphraseConfirm.required = confirm;
+  elements.passphraseGenerateButton.hidden = !confirm;
+  elements.passphraseInput.minLength = confirm ? MIN_PASSPHRASE_LENGTH : 0;
+  // Shown in plain text when setting a passphrase, so a generated one can be noted down.
+  elements.passphraseInput.type = confirm ? "text" : "password";
+  elements.passphraseConfirm.type = elements.passphraseInput.type;
+
+  return new Promise((resolve) => {
+    passphraseResolve = resolve;
+    showDialog(elements.passphraseDialog);
+    elements.passphraseInput.focus();
+  });
+}
+
+function resolvePassphrase() {
+  const resolve = passphraseResolve;
+  passphraseResolve = null;
+
+  resolve?.(
+    elements.passphraseDialog.returnValue === "ok"
+      ? elements.passphraseInput.value
+      : null
+  );
+}
+
+function checkPassphraseMatch(event) {
+  const mismatch =
+    passphraseSetMode &&
+    elements.passphraseInput.value !== elements.passphraseConfirm.value;
+
+  if (mismatch) {
+    event.preventDefault();
+    elements.passphraseConfirm.setCustomValidity(
+      t("Die Passphrasen stimmen nicht überein.")
+    );
+    elements.passphraseConfirm.reportValidity();
+  }
+}
+
+function clearPassphraseMismatch() {
+  elements.passphraseConfirm.setCustomValidity("");
+}
+
+function fillGeneratedPassphrase() {
+  const passphrase = generatePassphrase();
+  elements.passphraseInput.value = passphrase;
+  elements.passphraseConfirm.value = passphrase;
+}
+
+// Asks for the passphrase until the envelope opens; null if the user gives up.
+async function unlockEnvelope(envelope) {
+  let message = t("Diese Datei ist verschlüsselt. Bitte die Passphrase eingeben.");
+
+  for (;;) {
+    const passphrase = await askPassphrase({
+      title: t("Organigramm entsperren"),
+      message
+    });
+
+    if (passphrase === null) {
+      return null;
+    }
+
+    const value = await decryptData(envelope, passphrase);
+
+    if (value) {
+      return prepareData(value);
+    }
+
+    message = t("Passphrase falsch oder Datei beschädigt. Bitte erneut eingeben.");
   }
 }
 
