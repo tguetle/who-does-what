@@ -1,7 +1,8 @@
 {
   "name": "who-does-what",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
+  "license": "AGPL-3.0-only",
   "description": "Organisations- und Kompetenzstruktur als statische Webseite",
   "scripts": {
     "test": "npm run test:data && npm run test:e2e",

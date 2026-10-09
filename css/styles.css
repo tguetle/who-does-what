@@ -1362,6 +1362,23 @@ dialog form {
   margin: 3px 0;
 }
 
+.page-footer a,
+.legal-back a {
+  color: var(--asv-blue);
+}
+
+.legal {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 24px 30px;
+}
+
+.legal h2 {
+  margin: 24px 0 6px;
+  color: var(--asv-blue-dark);
+  font-size: 1.1rem;
+}
+
 .app-build {
   margin-left: 6px;
   padding: 1px 8px;

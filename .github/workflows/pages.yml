@@ -35,7 +35,7 @@ jobs:
           TAG=$(git tag --points-at HEAD --list 'v*' | head -n 1)
           TAGGED=false
           if [ -n "$TAG" ]; then TAGGED=true; fi
-          printf '{"version":"%s","tagged":%s}\n' "$VERSION" "$TAGGED" > build.json
+          printf 'window.BUILD_INFO = {"version":"%s","tagged":%s};\n' "$VERSION" "$TAGGED" > js/build-info.js
 
       - name: Pages einrichten
         uses: actions/configure-pages@v5

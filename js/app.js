@@ -137,11 +137,11 @@ async function fetchJson(url) {
   return response.json();
 }
 
-// build.json is written by the Pages workflow and missing in local runs.
+// js/build-info.js is written by the Pages workflow and stays null in local runs.
 async function loadAppVersion() {
   const versionElement = document.getElementById("app-version");
   const buildElement = document.getElementById("app-build");
-  const build = await fetchJson("./build.json").catch(() => null);
+  const build = window.BUILD_INFO;
 
   if (build) {
     versionElement.textContent = build.version;

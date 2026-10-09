@@ -339,6 +339,22 @@ const LANGUAGES = {
       "Umfang": "Scope",
       "Vollständig (mit Aufgaben und Details)": "Complete (with tasks and details)",
       "Aushang (oberste Ebenen, ohne Details)": "Notice board (top levels, without details)",
+
+      // impressum.html
+      "Impressum · Who Does What": "Legal notice · Who Does What",
+      "Rechtliches": "Legal",
+      "Impressum": "Legal notice",
+      "Herkunft des Projekts": "Origin of the project",
+      "Who Does What ist eine generische Webanwendung zur Darstellung von Organisations- und Kompetenzstrukturen. Der Quellcode ist öffentlich verfügbar unter": "Who Does What is a generic web application for displaying organizational and competence structures. The source code is publicly available at",
+      "Live-Version:": "Live version:",
+      "Lizenz": "License",
+      "Copyright © 2026 tguetle. Dieses Projekt steht unter der": "Copyright © 2026 tguetle. This project is licensed under the",
+      "(AGPL-3.0). Du darfst den Code kopieren, verändern und nutzen. Wenn du ihn veränderst und die veränderte Version weitergibst oder als Webdienst anbietest, musst du sie unter derselben Lizenz veröffentlichen und den Quellcode den Nutzern zugänglich machen.": "(AGPL-3.0). You may copy, modify and use the code. If you modify it and distribute the modified version or offer it as a web service, you must publish it under the same license and make the source code available to users.",
+      "Den vollständigen Lizenztext findest du in der": "You can find the full license text in the",
+      "Datei LICENSE": "LICENSE file",
+      "Haftungsausschluss": "Disclaimer",
+      "Die Inhalte dieser Seite wurden mit Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte wird keine Gewähr übernommen. Die Organisationsdaten stammen von den jeweils verantwortlichen Stellen.": "The content of this page was prepared with care. No warranty is given for the accuracy, completeness or currency of the content. The organization data comes from the respective responsible bodies.",
+      "Zurück zur Organigramm-Ansicht": "Back to organigram view",
     }
   }
 };
@@ -384,6 +400,10 @@ function initLanguage() {
   );
   select.value = currentLanguage;
   select.addEventListener("change", () => switchLanguage(select.value));
+
+  document.querySelectorAll("a[data-keep-lang]").forEach((link) => {
+    link.search = `?lang=${currentLanguage}`;
+  });
 }
 
 // Reload instead of live switching: pickers and selects are built once during setup.

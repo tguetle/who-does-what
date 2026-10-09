@@ -2,6 +2,10 @@
 
 Statische Webseite zur Darstellung von Organisations- und Kompetenzstrukturen. Die App ist generisch: Der Code enthält keine Organisationsdaten, alle Inhalte stehen in einer JSON-Datei.
 
+**Live ausprobieren:** https://tguetle.github.io/who-does-what/
+
+![Screenshot der Organigramm-Ansicht](docs/screenshot.png)
+
 ## Funktionen
 
 - Organigramm, Baumansicht, Personenliste, Ansprechpartner, Mitmachen, Kompetenzen und Risiken
@@ -92,3 +96,7 @@ git push --follow-tags
 Voraussetzung: unter Settings → Pages ist als Source „GitHub Actions“ eingestellt.
 
 Alle Dateien im Repository sind öffentlich abrufbar, auch die JSON-Daten. Echte Personendaten gehören daher nicht ins Repository (siehe `.gitignore`).
+
+## Lizenz
+
+AGPL-3.0-only, siehe [LICENSE](LICENSE). Veränderte Versionen müssen unter derselben Lizenz veröffentlicht werden, auch wenn sie nur als Webdienst laufen.

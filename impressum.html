@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Impressum · Who Does What</title>
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+
+<body>
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Rechtliches</p>
+      <h1>Impressum</h1>
+    </div>
+
+    <select id="language-select" class="language-select" aria-label="Sprache"></select>
+  </header>
+
+  <main class="legal">
+    <section>
+      <h2>Herkunft des Projekts</h2>
+      <p>
+        Who Does What ist eine generische Webanwendung zur Darstellung von
+        Organisations- und Kompetenzstrukturen. Der Quellcode ist öffentlich
+        verfügbar unter
+        <a href="https://github.com/tguetle/who-does-what">github.com/tguetle/who-does-what</a>.
+      </p>
+      <p>
+        Live-Version: <a href="https://tguetle.github.io/who-does-what/">tguetle.github.io/who-does-what</a>
+      </p>
+    </section>
+
+    <section>
+      <h2>Lizenz</h2>
+      <p>
+        Copyright © 2026 tguetle. Dieses Projekt steht unter der
+        <a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU Affero General Public License v3.0</a>
+        (AGPL-3.0). Du darfst den Code kopieren, verändern und nutzen. Wenn du
+        ihn veränderst und die veränderte Version weitergibst oder als Webdienst
+        anbietest, musst du sie unter derselben Lizenz veröffentlichen und den
+        Quellcode den Nutzern zugänglich machen.
+      </p>
+      <p>
+        Den vollständigen Lizenztext findest du in der
+        <a href="https://github.com/tguetle/who-does-what/blob/main/LICENSE">Datei LICENSE</a>.
+      </p>
+    </section>
+
+    <section>
+      <h2>Haftungsausschluss</h2>
+      <p>
+        Die Inhalte dieser Seite wurden mit Sorgfalt erstellt. Für die
+        Richtigkeit, Vollständigkeit und Aktualität der Inhalte wird keine
+        Gewähr übernommen. Die Organisationsdaten stammen von den jeweils
+        verantwortlichen Stellen.
+      </p>
+    </section>
+
+    <p class="legal-back">
+      <a href="./index.html" data-keep-lang>Zurück zur Organigramm-Ansicht</a>
+    </p>
+  </main>
+
+  <script src="./js/i18n.js"></script>
+  <script>
+    initLanguage();
+    document.title = t(document.title);
+  </script>
+</body>
+</html>
